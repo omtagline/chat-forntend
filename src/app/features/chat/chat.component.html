@@ -1,0 +1,70 @@
+<div class="chat-app bg-gray-900 min-h-screen flex overflow-hidden">
+    <!-- Sidebar -->
+    <div class="sidebar bg-gray-800 text-gray-300 w-80 flex flex-col">
+        <div class="sidebar-header p-4 flex justify-between items-center border-b border-gray-700">
+            <h2 class="text-xl font-semibold text-white">Chats</h2>
+            <button class="cool-button" (click)="addChat()">
+                <i class="fas fa-plus text-lg"></i>
+            </button>
+        </div>
+        <div class="sidebar-content flex-grow overflow-y-auto custom-scrollbar">
+            <!-- <div class="chat-section p-4">
+                <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">Personal Chats</h3>
+                <button class="chat-button"><i class="fas fa-user mr-2"></i> Alice</button>
+                <button class="chat-button"><i class="fas fa-user mr-2"></i> Bob</button>
+                <button class="chat-button"><i class="fas fa-user mr-2"></i> Charlie</button>
+            </div> -->
+            <!-- <div class="separator border-t border-gray-700 my-4"></div> -->
+            <div class="chat-section p-4">
+                <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">Room Chats</h3>
+                @for (data of channels; track $index) {
+                    <div class="flex justify-between " [ngClass]="{'active':roomId==data.roomId}" >
+                        <button class="chat-button flex justify-between " [ngClass]="{'active':roomId==data.roomId}" (click)="joinChannel(email,data)">
+                            <i class="fas fa-users mr-2"></i> {{data.name}}
+                            </button>
+                        <button (click)="delete(data.roomId)"><i class="fa-solid fa-trash text-red-200"></i></button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Chat Area -->
+    <div class="main-chat flex-grow flex flex-col bg-gray-100">
+        <div class="chat-header flex justify-between items-center  bg-white border-b border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-800">{{currentRoom}}</h2>
+            <button class="bg-red-200 px-4 py-2 text-red-800 rounded-lg " (click)="logOut()"><i class="fa-solid fa-right-from-bracket"></i> logout</button>
+        </div>
+
+        <div class="messages-area flex-grow overflow-y-auto p-4 custom-scrollbar">
+            @if (!messages.length) {
+            <p class="text-center text-gray-500 italic">No messages yet. Start a conversation!</p>
+            <p class="text-center text-gray-500 italic"> Please note, this chat is temporary. If I leave or the conversation ends, all messages will be deleted.</p>
+            } @else {
+            @for (data of messages; track $index) {
+            <div class="flex flex-col mb-4" [ngClass]="{ 'items-end': data.email === 'me','items-center':data.email=='joined'}">
+                @if (data.email=='joined') {
+                    <span class=" text-gray-400"> <i class="fas fa-user-circle mr-1"></i> {{ data.message+' '+data.email}}</span>
+                }@else {
+                    <p class="text-sm text-gray-600 mb-1">
+                        <i class="fas fa-user-circle mr-1"></i> {{data.email}}
+                    </p>
+                <div class="cool-message w-fit" [ngClass]="{ 'self-message': data.email === 'me'}">
+                    {{data.message}}    
+                </div>
+                }
+            </div>
+            }
+            }
+        </div>
+        <div class="input-area p-4 bg-white border-t border-gray-200">
+            <form class="input-form flex">
+                <input type="text" class="cool-input flex-grow mr-2" placeholder="Type a message..." #message (change)="startTyping()">
+                <button type="submit" class="cool-button" (click)="sendMessage(message)">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+

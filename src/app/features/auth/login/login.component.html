@@ -1,0 +1,65 @@
+<div
+    class="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-indigo-800 to-blue-900 overflow-hidden">
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <!-- Magical stars -->
+        <div class="absolute w-2 h-2 bg-yellow-300 rounded-full top-1/4 left-1/4 twinkle-animation"></div>
+        <div class="absolute w-1 h-1 bg-blue-300 rounded-full top-1/2 left-1/3 twinkle-animation"
+            style="animation-delay: -1s;"></div>
+        <div class="absolute w-1.5 h-1.5 bg-purple-300 rounded-full top-3/4 left-2/3 twinkle-animation"
+            style="animation-delay: -2s;"></div>
+        <div class="absolute w-1 h-1 bg-pink-300 rounded-full top-1/3 right-1/4 twinkle-animation"
+            style="animation-delay: -0.5s;"></div>
+        <div class="absolute w-2 h-2 bg-green-300 rounded-full bottom-1/4 right-1/3 twinkle-animation"
+            style="animation-delay: -1.5s;"></div>
+
+        <!-- Magical circles -->
+        <div
+            class="absolute top-0 left-0 w-64 h-64 bg-gradient-to-br from-pink-500 to-purple-500 rounded-full opacity-20 blur-2xl rotate-animation">
+        </div>
+        <div class="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-500 to-green-500 rounded-full opacity-20 blur-2xl rotate-animation"
+            style="animation-direction: reverse;"></div>
+    </div>
+
+    <div class="relative w-full max-w-md" #formContainer>
+        <div class="bg-white bg-opacity-10 backdrop-blur-lg rounded-xl p-8 shadow-2xl relative z-10">
+            <h2 class="text-3xl font-bold mb-6 text-center text-white">Chat Portal</h2>
+            <form [formGroup]="enchantedForm" (ngSubmit)="onSubmit()" class="space-y-6">
+                <div class="relative">
+                    <input type="text" formControlName="mysticalName" placeholder="Your Mystical Name"
+                        class="w-full bg-white bg-opacity-20 text-black placeholder-gray-300 border-none rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-purple-400 transition-all duration-300 ease-in-out">
+                    @if (enchantedForm.get('mysticalName')?.touched
+                    &&enchantedForm.get('mysticalName')?.errors?.['required'] ) {
+                     <span class="text-red-400 ps-1">
+                        Please Enter your name
+                    </span>
+                    }
+                    <div class="absolute right-3 top-3 w-6 h-6 bg-purple-400 rounded-full opacity-0 pulse-animation">
+                    </div>
+                </div>
+                <div class="relative">
+                    <input type="email" formControlName="etherealEmail" placeholder="Your Ethereal Email"
+                        class="w-full bg-white bg-opacity-20 text-black placeholder-gray-300 border-none rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-purple-400 transition-all duration-300 ease-in-out">
+                    @if (enchantedForm.get('etherealEmail')?.touched
+                    &&enchantedForm.get('etherealEmail')?.errors?.['required'] ) {
+                    <span class="text-red-400 ps-1">
+                        Please Enter your Email
+                    </span>
+                    }
+                    @if (enchantedForm.get('etherealEmail')?.touched
+                    &&enchantedForm.get('etherealEmail')?.errors?.['email'] ) {
+                    <span class="text-red-400 ps-1"> please Enter valid Email</span>
+                    }
+
+                    <div class="absolute right-3 top-3 w-6 h-6 bg-blue-400 rounded-full opacity-0 pulse-animation"
+                        style="animation-delay: -2s;"></div>
+                </div>
+                <button type="submit" [disabled]="!enchantedForm.valid"
+                    class="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-bold py-3 rounded-full transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-400 relative overflow-hidden group">
+                    <span class="relative z-10">Open the Portal</span>
+                    <span
+                        class="absolute inset-0 bg-gradient-to-r from-blue-500 to-green-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out"></span>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

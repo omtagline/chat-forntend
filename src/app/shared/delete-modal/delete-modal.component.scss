@@ -1,0 +1,62 @@
+// Colors and size variables for a majestic feel
+$dialog-width: 450px;
+$dialog-padding: 2rem;
+$dark-purple: #ffffff;
+$deep-red: #900d0d;
+$hover-deep-red: #6d0000;
+$text-gray: #2a2a2a;
+
+.fixed {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.bg-dark-purple {
+  background-color: $dark-purple;
+  width: $dialog-width;
+  padding: $dialog-padding;
+  border-radius: 12px;
+  box-shadow: 0 20px 35px rgba(0, 0, 0, 0.3);
+}
+
+// Heading style for an ominous feel
+h2 {
+  font-size: 2rem;
+  color: $deep-red;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+// Paragraph style
+p {
+  color: $text-gray;
+  font-size: 1.125rem;
+  margin-bottom: 2rem;
+}
+
+// Cancel button customization
+.cancel-btn {
+  background-color: #374151;
+  &:hover {
+    background-color: #1f2937;
+  }
+}
+
+// Delete button customization with an ominous red tone
+.delete-btn {
+  background-color: $deep-red;
+  &:hover {
+    background-color: $hover-deep-red;
+  }
+}
+
+// Transition and hover effects
+.transform {
+  transform: scale(0.9);
+  transition: transform 0.5s ease-in-out;
+  &:hover {
+    transform: scale(1);
+  }
+}

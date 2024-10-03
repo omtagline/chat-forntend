@@ -1,0 +1,44 @@
+<form [formGroup]="form" (ngSubmit)="join()" class="max-w-lg mx-auto p-6 bg-white shadow-lg rounded-md">
+    <!-- Room ID Field -->
+    <!-- <div class="mb-4"> -->
+      <!-- <label for="roomId" class="block text-gray-700 font-semibold mb-2">Room Id</label> -->
+      <!-- <input
+        type="text"
+        formControlName="roomId"
+        placeholder="Enter your room id"
+        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+      /> -->
+      <!-- Error Message for Room ID -->
+      <!-- <div *ngIf="form.get('roomId')?.invalid && form.get('roomId')?.touched" class="text-red-500 text-sm mt-1">
+        <span *ngIf="form.get('roomId')?.errors?.['required']">Please enter the Room Id</span>
+      </div>
+    </div> -->
+  
+    <!-- name Field -->
+    <div class="mb-4">
+      <label for="name" class="block text-gray-700 font-semibold mb-2">Room Name</label>
+      <input
+        type="text"
+        formControlName="name"
+        placeholder="Enter your room name"
+        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+      />
+      <!-- Error Message for name (optional) -->
+      <div *ngIf="form.get('name')?.invalid && form.get('name')?.touched" class="text-red-500 text-sm mt-1">
+        <span *ngIf="form.get('name')?.errors?.['required']">Please enter name</span>
+      </div>
+    </div>
+  
+    <!-- Submit Button -->
+    <div class="mt-6">
+      <button
+        type="submit"
+        [disabled]="form.invalid"
+        class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 disabled:opacity-50"
+      >
+        
+      Add Room
+      </button>
+    </div>
+  </form>
+  

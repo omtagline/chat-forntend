@@ -1,0 +1,138 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+// Cool variables
+$primary-color: #3498db;
+$secondary-color: #2ecc71;
+$accent-color: #e74c3c;
+$text-color: #333333;
+$bg-color: #f5f5f5;
+
+// Mixins
+@mixin cool-transition {
+  transition: all 0.2s ease-in-out;
+}
+
+// Global styles
+body {
+  font-family: 'Inter', sans-serif;
+  color: $text-color;
+  background-color: $bg-color;
+}
+
+// Cool buttons
+.cool-button {
+  @include cool-transition;
+  background-color: $primary-color;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  
+  &:hover {
+    background-color: darken($primary-color, 10%);
+    transform: translateY(-2px);
+  }
+}
+
+// Cool inputs
+.cool-input {
+  @include cool-transition;
+  background-color: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  color: $text-color;
+  padding: 0.5rem 1rem;
+  
+  &:focus {
+    border-color: $primary-color;
+    box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+    outline: none;
+  }
+}
+
+// Chat buttons
+.chat-button {
+  @include cool-transition;
+  background-color: transparent;
+  border: none;
+  border-radius: 8px;
+  color: #a0aec0;
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem 1rem;
+  width: 100%;
+  text-align: left;
+  
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+  }
+  &.active{
+    background-color:$primary-color;
+    color: black
+    
+  }
+}
+.active{
+  background-color:$primary-color;
+  color: black;
+  margin-bottom: 0.5rem;
+  padding:0.5rem 0.5rem;
+  width: 100%;
+  border-radius: 8px;
+  
+}
+
+// Messages
+.cool-message {
+  @include cool-transition;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+//   max-width: 80%;
+max-width: fit-content;
+  padding: 0.75rem 1rem;
+  
+  &.self-message {
+    background-color: $primary-color;
+    color: white;
+    align-self: flex-end;
+  }
+}
+
+// Custom scrollbar
+.custom-scrollbar {
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+  }
+  
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.3);
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .chat-app {
+    flex-direction: column;
+  }
+  
+  .sidebar {
+    width: 100%;
+    max-height: 300px;
+  }
+}
+
+
+
