@@ -158,3 +158,22 @@ width: 100px;
   }
 }
 
+
+
+
+/* Apply flexbox and breakpoints */
+.chat-app {
+  @apply flex flex-col lg:flex-row;
+}
+
+.sidebar {
+  @apply w-full lg:w-80;
+}
+
+.main-chat {
+  @apply flex-grow;
+}
+
+.messages-area {
+  @apply flex-grow overflow-y-auto p-4;
+}

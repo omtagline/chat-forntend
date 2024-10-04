@@ -27,15 +27,39 @@
                 </div>
                 }
             </div>
+
+            <div class="w-full flex justify-center">
+                <button class="bg-red-200 px-4 py-2 text-red-800 rounded-lg " (click)="logOut()"><i
+                    class="fa-solid fa-right-from-bracket"></i> logout</button>
+            </div>
         </div>
     </div>
     @if (roomId) {
     <div class="main-chat flex-grow flex flex-col bg-gray-100">
         <div class="chat-header flex justify-between items-center  bg-white border-b border-gray-200">
             <h2 class="text-xl font-semibold text-gray-800">{{currentRoom}}</h2>
-            <button class="bg-red-200 px-4 py-2 text-red-800 rounded-lg " (click)="logOut()"><i
-                    class="fa-solid fa-right-from-bracket"></i> logout</button>
+            <div class="call-controls flex justify-center space-x-2">
+                <button class="bg-green-500 text-white px-4 rounded-md py-2 " (click)="startVideoCall()">
+                    <i class="fa-solid fa-video"></i>
+                </button>
+                <button class="bg-blue-500 text-white px-4 py-2  rounded-md" (click)="startAudioCall()">
+                    <i class="fa-solid fa-phone"></i>
+                </button>
+                @if (callStarted) {
+                    <button class="bg-red-500 text-white px-4 py-2  rounded-md" (click)="stopCall()">
+                        <i class="fa-solid fa-phone-slash"></i>
+                    </button>
+                }
+            </div>
+    
         </div>
+        @if (callStarted) {
+            <div class="video-call-area flex justify-center my-4">
+                <video id="localVideo" autoplay muted class="w-1/3 border rounded"></video>
+                <video id="remoteVideo" autoplay class="w-1/3 border rounded"></video>
+            </div>
+        }
+
 
         <div class="messages-area flex-grow overflow-y-auto p-4 custom-scrollbar">
             @if (!messages.length) {
@@ -144,8 +168,6 @@
     <div class="main-chat flex-grow flex flex-col bg-gray-100">
         <div class="chat-header flex justify-between items-center  bg-white border-b border-gray-200">
             <h2 class="text-xl font-semibold text-gray-800">{{currentRoom}}</h2>
-            <button class="bg-red-200 px-4 py-2 text-red-800 rounded-lg " (click)="logOut()"><i
-                    class="fa-solid fa-right-from-bracket"></i> logout</button>
         </div>
 
         <div class="messages-area flex-grow overflow-y-auto p-4 custom-scrollbar">

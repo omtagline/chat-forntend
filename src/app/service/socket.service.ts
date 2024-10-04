@@ -9,6 +9,7 @@ import { environment } from '../../environments/environment.development';
   providedIn: 'root'
 })
 export class SocketService {
+
   socket: any
   roomId: any
 
@@ -85,6 +86,48 @@ export class SocketService {
     return new Observable((observer) => {
       this.socket.on('receive-message', (data: any) => {
         // console.log(data);
+        observer.next(data)
+      })
+    })
+  }
+
+
+  sendOffer(offer: any, roomId: string) {
+    this.socket.emit('offer', { offer, roomId });
+  }
+  
+  sendAnswer(answer: any, roomId: string) {
+    this.socket.emit('answer', { answer, roomId });
+  }
+  
+  sendIceCandidate(candidate: RTCIceCandidate, roomId: string) {
+    this.socket.emit('ice-candidate', { candidate, roomId });
+  }
+  
+  listenForOffer(): Observable<any> {
+    return new Observable((observer) => {
+      this.socket.on('offer', (data: any) => {
+        console.log(data);
+        observer.next(data)
+      })
+    })
+  }
+  
+  listenForAnswer(): Observable<any> {
+    return new Observable((observer) => {
+      this.socket.on('answer', (data: any) => {
+        // console.log(data);
+        console.log(data);
+        observer.next(data)
+      })
+    })
+  }
+  
+  listenForIceCandidate(): Observable<any> {
+    return new Observable((observer) => {
+      this.socket.on('ice-candidate', (data: any) => {
+        // console.log(data);
+        console.log(data);
         observer.next(data)
       })
     })
