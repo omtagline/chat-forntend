@@ -45,21 +45,24 @@
                 <button class="bg-blue-500 text-white px-4 py-2  rounded-md" (click)="startAudioCall()">
                     <i class="fa-solid fa-phone"></i>
                 </button>
-                @if (callStarted) {
-                 
-                }
             </div>
     
         </div>
     @if (callStarted) {
-    <div class="video-call-wrapper">
-        <div class="video-call-area flex justify-center items-center">
-            <video id="localVideo" autoplay muted class="video half-width"></video>
-            <video id="remoteVideo" autoplay class="video half-width"></video>
+    <div class="video-call fixed top-0 left-0  bg-black bg-opacity-80 z-50">
+        <div class="bg-white h-full">
+            <div class="video-call-container flex flex-col items-center justify-center h-full">
+                <div class="video-call-area flex justify-center my-4 w-3/4">
+                </div>
+                <video controls id="localVideo" autoplay muted class="w-1/2 border rounded mr-2"></video>
+                <video controls id="remoteVideo" autoplay class="w-1/2 border rounded mr-2"></video>
+            <div class="call-controls flex justify-center mt-4 mb-4">
+                <button class="bg-red-500 text-white px-4 py-2 rounded-md" (click)="stopCall()">
+                    <i class="fa-solid fa-phone-slash"></i> Hang Up
+                </button>
+            </div>
+            </div>
         </div>
-        <button class="end-call-button" (click)="stopCall()">
-            <i class="fa-solid fa-phone-slash"></i>
-        </button>
     </div>
 }
 
