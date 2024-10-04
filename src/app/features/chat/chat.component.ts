@@ -87,7 +87,7 @@ export class ChatComponent {
   acceptCall(offer: RTCSessionDescriptionInit) {
     // First, request access to media (audio/video)
     navigator.mediaDevices
-      .getUserMedia({audio: true })  // Adjust to { audio: true } for audio-only calls
+      .getUserMedia({audio: true,video:true })  // Adjust to { audio: true } for audio-only calls
       .then((stream) => {
         // Save the media stream
         this.localStream = stream;
