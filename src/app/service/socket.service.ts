@@ -10,7 +10,7 @@ import { environment } from '../../environments/environment.development';
 })
 export class SocketService {
   socket: any
-  roomId:any
+  roomId: any
 
   constructor() {
     this.socket = io(environment.API)
@@ -19,7 +19,7 @@ export class SocketService {
 
   joinroom(roomId: any, email: any): void {
     // this.leaveChat(this.roomId)
-    this.roomId=roomId
+    this.roomId = roomId
     localStorage.setItem('email', email)
     this.socket.emit('join-room', { roomId, email })
   }
@@ -36,8 +36,8 @@ export class SocketService {
     this.socket.emit('join-chat', { email, roomId })
   }
 
-  startTyping(email:any,roomId:any):void{
-    this.socket.emit('typing',{email,roomId})
+  startTyping(email: any, roomId: any): void {
+    this.socket.emit('typing', { email, roomId })
   }
 
   leaveChat(roomId: any) {
@@ -51,7 +51,7 @@ export class SocketService {
       });
     });
   }
-  
+
   listenTyping(): Observable<any> {
     return new Observable((observer) => {
       this.socket.on('user-typing', (data: any) => {
@@ -61,7 +61,22 @@ export class SocketService {
   }
 
 
-  sendMessage(roomId:any,data: any) {
+  fileUpload(roomId: any, fileData: any, fileName: any,fileType:any) {
+    this.socket.emit('file-upload', { roomId, fileData, fileName,fileType })
+  }
+
+
+  getFiles(): Observable<any> {
+    return new Observable((observer) => {
+      this.socket.on('file-upload', (data: any) => {
+        console.log(data);
+        observer.next(data);
+      })
+    });
+  }
+
+
+  sendMessage(roomId: any, data: any) {
     const email = localStorage.getItem('email')
     this.socket.emit('send-message', { roomId, message: data, email })
   }

@@ -18,53 +18,145 @@
             <div class="chat-section p-4">
                 <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">Room Chats</h3>
                 @for (data of channels; track $index) {
-                    <div class="flex justify-between " [ngClass]="{'active':roomId==data.roomId}" >
-                        <button class="chat-button flex justify-between " [ngClass]="{'active':roomId==data.roomId}" (click)="joinChannel(email,data)">
-                            <i class="fas fa-users mr-2"></i> {{data.name}}
-                            </button>
-                        <button (click)="delete(data.roomId)"><i class="fa-solid fa-trash text-red-200"></i></button>
-                    </div>
+                <div class="flex justify-between " [ngClass]="{'active':roomId==data.roomId}">
+                    <button class="chat-button flex justify-between " [ngClass]="{'active':roomId==data.roomId}"
+                        (click)="joinChannel(email,data)">
+                        <i class="fas fa-users mr-2"></i> {{data.name}}
+                    </button>
+                    <button (click)="delete(data.roomId)"><i class="fa-solid fa-trash text-red-200"></i></button>
+                </div>
                 }
             </div>
         </div>
     </div>
-
-    <!-- Main Chat Area -->
+    @if (roomId) {
     <div class="main-chat flex-grow flex flex-col bg-gray-100">
         <div class="chat-header flex justify-between items-center  bg-white border-b border-gray-200">
             <h2 class="text-xl font-semibold text-gray-800">{{currentRoom}}</h2>
-            <button class="bg-red-200 px-4 py-2 text-red-800 rounded-lg " (click)="logOut()"><i class="fa-solid fa-right-from-bracket"></i> logout</button>
+            <button class="bg-red-200 px-4 py-2 text-red-800 rounded-lg " (click)="logOut()"><i
+                    class="fa-solid fa-right-from-bracket"></i> logout</button>
         </div>
 
         <div class="messages-area flex-grow overflow-y-auto p-4 custom-scrollbar">
             @if (!messages.length) {
             <p class="text-center text-gray-500 italic">No messages yet. Start a conversation!</p>
-            <p class="text-center text-gray-500 italic"> Please note, this chat is temporary. If I leave or the conversation ends, all messages will be deleted.</p>
+            <p class="text-center text-gray-500 italic"> Please note, this chat is temporary. If I leave or the
+                conversation ends, all messages will be deleted.</p>
             } @else {
             @for (data of messages; track $index) {
-            <div class="flex flex-col mb-4" [ngClass]="{ 'items-end': data.email === 'me','items-center':data.email=='joined'}">
+
+            <div class="flex flex-col mb-4"
+                [ngClass]="{ 'items-end': data.email === 'me', 'items-center': data.email == 'joined' }">
                 @if (data.email=='joined') {
-                    <span class=" text-gray-400"> <i class="fas fa-user-circle mr-1"></i> {{ data.message+' '+data.email}}</span>
-                }@else {
-                    <p class="text-sm text-gray-600 mb-1">
-                        <i class="fas fa-user-circle mr-1"></i> {{data.email}}
-                    </p>
-                <div class="cool-message w-fit" [ngClass]="{ 'self-message': data.email === 'me'}">
-                    {{data.message}}    
+                    <div class="flex align-middle">
+                        <i class="fas fa-user-circle mr-1"></i> 
+                        <p class="text-center">{{data.message +' '+data.email }}</p>
+                    </div>
+                }
+                @else {
+                <p class="text-sm text-gray-600 mb-1">
+                    <i class="fas fa-user-circle mr-1"></i> {{ data.email }}
+                </p>
+                <div class="cool-message w-fit " [ngClass]="{ 'self-message': data.email === 'me' }">
+
+
+                    {{ data.message }}
+                    <ng-container *ngIf="data.fileData">
+                        <ng-container *ngIf="data.fileType.includes('image/')">
+                            <img [src]="data.fileData " alt="{{ data.message }}" class="preview-image" />
+                            <a (click)="downloadFile(data.fileData, data.message)" class="text-slate-200">
+                                <i class="fa-solid fa-download cursor-pointer"></i>
+                            </a>
+                        </ng-container>
+                        <ng-container *ngIf="data.fileType.includes('audio/')">
+                            <audio controls>
+                                <source [src]="data.fileData" type="audio/mpeg" />
+                                Your browser does not support the audio tag.
+                            </audio>
+                        </ng-container>
+                        <ng-container *ngIf="data.fileType.includes('application/')">
+                            <div class=" flex justify-between w-full">
+                                <img src="../images/doc.png" alt="" class="preview-image">
+                                <a [href]="data.fileData" class="text-slate-300" target="_blank"
+                                    rel="noopener noreferrer"><i class="fa-solid fa-eye"></i></a>
+                            </div>
+
+                        </ng-container>
+                    </ng-container>
                 </div>
                 }
             </div>
             }
             }
         </div>
+        <div class="bg-blue-300 w-1/3 mb-1  p-3 rounded-lg " *ngIf="tempFileData.fileName">
+            <div class="d-flex">
+                <p class="text-wrap w-fit pr-4 p-2">{{tempFileData.fileName}}</p>
+                <button (click)="deSelectFiles()"><i class="fa-solid fa-x"></i></button>
+            </div>
+
+        </div>
         <div class="input-area p-4 bg-white border-t border-gray-200">
-            <form class="input-form flex">
-                <input type="text" class="cool-input flex-grow mr-2" placeholder="Type a message..." #message (change)="startTyping()">
+            <form class="input-form flex items-center">
+                <!-- Attachment Button -->
+                <div class="relative">
+                    <button type="button" class="cool-button mr-2" (click)="toggleAttachmentMenu()">
+                        <i class="fas fa-paperclip"></i>
+                    </button>
+                    <!-- Attachment Dropdown -->
+                    <div *ngIf="attachmentMenuVisible"
+                        class="absolute left-0 bottom-full mb-2 w-48 bg-white border border-gray-300 rounded shadow-lg z-10">
+                        <ul>
+                            <li class="dropdown-item" (click)="attachFile('document')"><i
+                                    class="fas fa-file-alt mr-2"></i> Document</li>
+                            <li class="dropdown-item" (click)="attachFile('image')"><i class="fas fa-image mr-2"></i>
+                                Image</li>
+                            <li class="dropdown-item" (click)="attachFile('audio')"><i class="fas fa-music mr-2"></i>
+                                Audio</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Hidden File Input for Documents -->
+                <input type="file" id="documentInput" style="display: none;"
+                    (change)="handleFileInput($event, 'document')" accept=".pdf,.doc,.docx,.txt">
+
+                <!-- Hidden File Input for Images -->
+                <input type="file" id="imageInput" style="display: none;" (change)="handleFileInput($event, 'image')"
+                    accept="image/*">
+
+                <!-- Hidden File Input for Audio -->
+                <input type="file" id="audioInput" style="display: none;" (change)="handleFileInput($event, 'audio')"
+                    accept="audio/*">
+
+                <!-- Message Input -->
+                <input type="text" class="cool-input flex-grow mr-2" placeholder="Type a message..." #message>
+
+                <!-- Send Button -->
                 <button type="submit" class="cool-button" (click)="sendMessage(message)">
                     <i class="fas fa-paper-plane"></i>
                 </button>
             </form>
         </div>
     </div>
-</div>
 
+    }@else {
+    <div class="main-chat flex-grow flex flex-col bg-gray-100">
+        <div class="chat-header flex justify-between items-center  bg-white border-b border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-800">{{currentRoom}}</h2>
+            <button class="bg-red-200 px-4 py-2 text-red-800 rounded-lg " (click)="logOut()"><i
+                    class="fa-solid fa-right-from-bracket"></i> logout</button>
+        </div>
+
+        <div class="messages-area flex-grow overflow-y-auto p-4 custom-scrollbar">
+            <p class="text-center text-gray-500 italic">Join a room to start a conversation</p>
+            <p class="text-center text-gray-500 italic">
+                Please note, this chat is temporary. If I leave or the conversation ends, all messages will be deleted.
+            </p>
+        </div>
+
+
+    </div>
+    }
+    <!-- Main Chat Area -->
+</div>

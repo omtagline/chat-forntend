@@ -20,17 +20,18 @@ import { Router } from '@angular/router';
 })
 export class ChatComponent {
 
+
   socketService = inject(SocketService)
   channelService = inject(ChannelsService)
   router = inject(Router)
   modal = inject(NgbModal)
+  attachmentMenuVisible = false;
+  tempFileData: any = {}
   email: any
   messages: any = []
   channels: any = []
   roomId: any
-  // joinRoom() {
-  //   this.socketService.joinroom("om@gmail.com", 123456)
-  // }
+
 
   ngOnInit(): void {
 
@@ -45,8 +46,43 @@ export class ChatComponent {
     })
 
     this.getChannels()
-    this.listenTyping()
 
+    this.getFiles()
+
+  }
+
+
+  getFiles() {
+    this.socketService.getFiles().subscribe((data: any) => {
+      const { fileName, fileData, fileType, sender } = data;
+      console.log(data);
+
+      // Create the message object
+      const message = {
+        email: sender === this.socketService.socket.id ? 'me' : 'other', // Determine if it was sent by the current user or another
+        message: fileName, // Display the file name
+        fileData, // Include the Base64 data for preview
+        fileType // Include the file type
+      };
+
+      // If receiving Base64 data
+      if (fileData && typeof fileData === 'string' && fileData.startsWith('data:')) {
+        // Use the Base64 string directly as the source for the file
+        message.fileData = fileData; // This should already be a Base64 URL
+      } else if (fileData && fileData._placeholder) {
+        console.log('Binary data placeholder received. Expect binary message.');
+        // Handle placeholder logic if needed
+      } else {
+        // Handle binary data
+        const blob = new Blob([fileData], { type: fileType });
+        const url = URL.createObjectURL(blob);
+        message.fileData = url; // Assign the URL to fileData
+        console.log('File URL:', url);
+      }
+
+      // Add the message to your messages array
+      this.messages.push(message);
+    });
   }
 
 
@@ -55,13 +91,80 @@ export class ChatComponent {
 
   }
 
-  private userJoined(username: string): void {
-    Swal.fire({
-      title: 'User Joined!',
-      text: `${username} has joined the channel.`,
-      icon: 'success',
-      confirmButtonText: 'Okay'
-    });
+  toggleAttachmentMenu() {
+    this.attachmentMenuVisible = !this.attachmentMenuVisible;
+  }
+
+
+  attachFile(fileType: string) {
+    if (fileType === 'document') {
+      const documentInput = document.getElementById('documentInput') as HTMLInputElement;
+      documentInput.click(); // Programmatically open file input
+    } else if (fileType === 'image') {
+      const imageInput = document.getElementById('imageInput') as HTMLInputElement;
+      imageInput.click();
+    } else if (fileType === 'audio') {
+      const audioInput = document.getElementById('audioInput') as HTMLInputElement;
+      audioInput.click();
+    }
+    this.attachmentMenuVisible = false; // Close the dropdown
+  }
+
+  handleFileInput(event: Event, fileType: string) {
+    const fileInput = event.target as HTMLInputElement;
+
+    if (fileInput.files && fileInput.files.length > 0) {
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+
+      // Read the file as ArrayBuffer (binary)
+      reader.readAsArrayBuffer(file);
+
+      // When file is loaded, process the binary data
+      reader.onload = () => {
+        const binaryData = reader.result as ArrayBuffer;
+
+        // console.log(`File selected for ${fileType}:`, file);
+        // console.log('Binary data:', binaryData);
+
+        // Now you can send this binary data over the socket
+        this.tempFileData = {
+          fileName: file.name,
+          fileType: file.type,
+          binaryData: binaryData,
+        }
+
+        // this.socket.emit('file-upload', { fileType, fileName: file.name, fileData: binaryData });
+      };
+
+      // Handle file reading errors
+      reader.onerror = (error) => {
+        console.error('Error reading file:', error);
+      };
+    }
+  }
+
+  deSelectFiles() {
+    this.tempFileData = {}
+  }
+
+  downloadFile(blobData: Blob, fileName: string): void {
+    // Create a new Blob object if blobData is in base64 or raw format
+    const fileBlob = new Blob([blobData], { type: 'image/jpeg' }); // Adjust type based on the file type
+
+    // Create a download link
+    const url = window.URL.createObjectURL(fileBlob);
+
+    // Create an anchor element and trigger the download
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName || 'downloaded_image.jpg';  // Use the provided file name or a default one
+    document.body.appendChild(a);
+    a.click();
+
+    // Clean up
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
   }
 
   addChat(): void {
@@ -86,13 +189,23 @@ export class ChatComponent {
   }
 
   sendMessage(data: HTMLInputElement) {
-    let email= localStorage.getItem('email')
-
-    if (email) {
+    if (!data.value) {
+      return
+    }
+    let email = localStorage.getItem('email')
+    if (email ) {
       this.socketService.sendMessage(this.roomId, data.value)
       this.messages.push({ email: 'me', message: data.value })
       data.value = ""
-    }else{
+      if (this.tempFileData.fileName) {
+        const {
+          fileName,
+          fileType,
+          binaryData
+        } = this.tempFileData
+        this.socketService.fileUpload(this.roomId, binaryData, fileName, fileType)
+      }
+    } else {
       this.router.navigate([''])
     }
 
@@ -134,15 +247,5 @@ export class ChatComponent {
     this.router.navigate([''])
   }
 
-  listenTyping(){
-    this.socketService.listenTyping().subscribe((res:any)=>{
-      console.log(res);
-    })
-  }
-
-  startTyping(){
-    let email=localStorage.getItem('email')
-    this.socketService.startTyping(email,this.roomId)
-  }
 
 }
