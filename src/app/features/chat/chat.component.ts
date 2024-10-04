@@ -8,27 +8,24 @@ import { CommonModule } from '@angular/common';
 import { DeleteModalComponent } from '../../shared/delete-modal/delete-modal.component';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
+import { CallingComponent } from "../calling/calling.component";
 
 
 
 @Component({
   selector: 'app-chat',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, FormsModule],
+  imports: [ReactiveFormsModule, CommonModule, FormsModule, CallingComponent],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss'
 })
 export class ChatComponent {
-
 
   socketService = inject(SocketService)
   channelService = inject(ChannelsService)
   router = inject(Router)
   modal = inject(NgbModal)
   attachmentMenuVisible = false;
-  localStream: MediaStream | null = null;
-  remoteStream: MediaStream | null = null;
-  peerConnection: RTCPeerConnection | null = null;
   callStarted!:boolean
   tempFileData: any = {}
   email: any
@@ -52,123 +49,10 @@ export class ChatComponent {
 
     this.getFiles()
 
-    this.socketService.listenForOffer().subscribe((data:any) => {
-      console.log(data);
-      this.promptJoinCall(data.offer, data.from);
-    });
 
-    this.socketService.listenForAnswer().subscribe((data:any) => {
-      this.handleAnswer(data.answer, data.from);
-    });
-
-    this.socketService.listenForIceCandidate().subscribe((data:any) => {
-      this.handleIceCandidate(data.candidate, data.from);
-    });
 
   }
 
-  promptJoinCall(offer: RTCSessionDescriptionInit, from: string) {
-    Swal.fire({
-      title: 'Incoming Call',
-      text: 'Do you want to join the video call?',
-      icon: 'info',
-      showCancelButton: true,
-      confirmButtonText: 'Join',
-      cancelButtonText: 'Decline',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.acceptCall(offer);
-      } else {
-        Swal.fire('Call Declined', 'You declined the call.', 'info');
-      }
-    });
-  }
-
-  acceptCall(offer: RTCSessionDescriptionInit) {
-    // First, request access to media (audio/video)
-    navigator.mediaDevices
-      .getUserMedia({audio: true })  // Adjust to { audio: true } for audio-only calls
-      .then((stream) => {
-        // Save the media stream
-        this.localStream = stream;
-  
-        // Proceed to handle the peer connection
-        this.peerConnection = new RTCPeerConnection({
-          iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
-        });
-  
-        // Add tracks to the connection
-        this.localStream.getTracks().forEach((track) => {
-          this.peerConnection!.addTrack(track, this.localStream!);
-        });
-  
-        // Handle remote stream
-        this.peerConnection.ontrack = (event) => {
-          this.remoteStream = event.streams[0];
-          this.attachMediaStreams();
-        };
-  
-        // Handle ICE candidates
-        this.peerConnection.onicecandidate = (event) => {
-          if (event.candidate) {
-            this.socketService.sendIceCandidate(event.candidate, this.roomId);
-          }
-        };
-  
-        // Set remote description and create an answer
-        this.peerConnection
-          .setRemoteDescription(new RTCSessionDescription(offer))
-          .then(() => this.peerConnection?.createAnswer())
-          .then((answer) => this.peerConnection?.setLocalDescription(answer))
-          .then(() => {
-            // Send the answer back to the initiator
-            this.socketService.sendAnswer(this.peerConnection?.localDescription, this.roomId);
-          })
-          .catch((error) => {
-            Swal.fire('Error', 'Error handling the call: ' + error.message, 'error');
-          });
-          this.callStarted=true
-      })
-      .catch((error) => {
-        // Handle the case where the user denies media access
-        Swal.fire('Media Access Denied', 'You need to allow media access to join the call', 'error');
-      });
-  }
-
-  handleOffer(offer: RTCSessionDescriptionInit, from: string) {
-    if (!this.peerConnection) {
-      this.startCall(); // Ensure the call has started
-    }
-
-    this.peerConnection?.setRemoteDescription(new RTCSessionDescription(offer))
-      .then(() => {
-        // Create an answer and send it back
-        return this.peerConnection?.createAnswer();
-      })
-      .then((answer) => {
-        return this.peerConnection?.setLocalDescription(answer);
-      })
-      .then(() => {
-        this.socketService.sendAnswer(this.peerConnection?.localDescription, this.roomId);
-      })
-      .catch((error) => {
-        console.error('Error handling offer:', error);
-      });
-  }
-
-  handleAnswer(answer: RTCSessionDescriptionInit, from: string) {
-    this.peerConnection?.setRemoteDescription(new RTCSessionDescription(answer))
-      .catch((error) => {
-        console.error('Error setting remote description for answer:', error);
-      });
-  }
-
-  handleIceCandidate(candidate: RTCIceCandidateInit, from: string) {
-    this.peerConnection?.addIceCandidate(new RTCIceCandidate(candidate))
-      .catch((error) => {
-        console.error('Error adding received ICE candidate:', error);
-      });
-  }
 
 
   getFiles() {
@@ -357,129 +241,4 @@ export class ChatComponent {
     this.router.navigate([''])
   }
 
-
-   // WebRTC Methods
-   startVideoCall() {
-    Swal.fire({
-      title: 'Start Video Call?',
-      text: 'Do you want to initiate a video call?',
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, Start!',
-      cancelButtonText: 'No',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        navigator.mediaDevices
-          .getUserMedia({ video: true, audio: true })
-          .then((stream) => {
-            this.localStream = stream;
-            this.startCall();
-            this.callStarted=true
-
-          })
-          .catch((error) => {
-            Swal.fire('Error', 'Error accessing media devices.', 'error');
-            console.error('Error accessing media devices.', error);
-          });
-      }
-    });
-  }
-  
-  startAudioCall() {
-    Swal.fire({
-      title: 'Start Audio Call?',
-      text: 'Do you want to initiate an audio call?',
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, Start!',
-      cancelButtonText: 'No',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        navigator.mediaDevices
-          .getUserMedia({ audio: true })
-          .then((stream) => {
-            this.localStream = stream;
-            this.startCall();
-            this.callStarted=true
-          })
-          .catch((error) => {
-            Swal.fire('Error', 'Error accessing media devices.', 'error');
-            console.error('Error accessing media devices.', error);
-          });
-      }
-    });
-  }
-
-  startCall() {
-    const configuration = {
-      iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
-    };
-
-    this.peerConnection = new RTCPeerConnection(configuration);
-
-    this.localStream?.getTracks().forEach((track) => {
-      if (this.localStream) {
-        this.peerConnection?.addTrack(track, this.localStream);
-      }
-    });
-
-    this.peerConnection.ontrack = (event) => {
-      this.remoteStream = event.streams[0];
-      this.attachMediaStreams();
-    };
-
-    this.peerConnection.onicecandidate = (event) => {
-      if (event.candidate) {
-        this.socketService.sendIceCandidate(event.candidate, this.roomId);
-      }
-    };
-
-    this.createOffer();
-  }
-
-  createOffer() {
-    this.peerConnection
-      ?.createOffer()
-      .then((offer) => {
-        return this.peerConnection?.setLocalDescription(offer);
-      })
-      .then(() => {
-        this.socketService.sendOffer(this.peerConnection?.localDescription, this.roomId);
-      })
-      .catch((error) => {
-        console.error('Error creating an offer:', error);
-      });
-  }
-
-  attachMediaStreams() {
-    const localVideo = document.getElementById('localVideo') as HTMLVideoElement;
-    const remoteVideo = document.getElementById('remoteVideo') as HTMLVideoElement;
-
-    if (this.localStream) {
-      localVideo.srcObject = this.localStream;
-    }
-
-    if (this.remoteStream) {
-      remoteVideo.srcObject = this.remoteStream;
-    }
-  }
-
-  stopCall() {
-    if (this.peerConnection) {
-      this.peerConnection.close();
-      this.peerConnection = null;
-    }
-
-    if (this.localStream) {
-      this.localStream.getTracks().forEach((track) => track.stop());
-      this.localStream = null;
-    }
-
-    const localVideo = document.getElementById('localVideo') as HTMLVideoElement;
-    const remoteVideo = document.getElementById('remoteVideo') as HTMLVideoElement;
-    localVideo.srcObject = null;
-    remoteVideo.srcObject = null;
-    this.callStarted=false
-  }
-  
 }

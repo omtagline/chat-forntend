@@ -1,0 +1,54 @@
+<div class="call-controls flex justify-center space-x-2">
+    <button class="bg-green-500 text-white px-4 rounded-md py-2" (click)="startVideoCall()">
+        <i class="fa-solid fa-video"></i>
+    </button>
+    <button class="bg-blue-500 text-white px-4 py-2 rounded-md" (click)="startAudioCall()">
+        <i class="fa-solid fa-phone"></i>
+    </button>
+    <!-- <ng-container *ngIf="callStarted">
+        <button class="bg-red-500 text-white px-4 py-2 rounded-md" (click)="stopCall()">
+            <i class="fa-solid fa-phone-slash"></i>
+        </button>
+    </ng-container> -->
+</div>
+
+<!-- If video call is started, display video container in full screen -->
+<ng-container *ngIf="callStarted">
+    <div class="video-call fixed top-0 left-0 w-full h-full bg-black bg-opacity-80 z-50">
+    
+
+        <div class="video-call-container flex flex-col items-center justify-center h-full">
+            @if (!anyoneJoined) {
+                <div class="ringing-animation">
+                    <p>Ringing...</p>
+                  </div>
+            }@else {
+
+                    <div class="participants">
+
+                        <!-- Profile Picture or Fallback Circle with "Q" -->
+                        <div class="profile-container">
+                          <!-- <img  alt="Profile Picture" class="profile-pic" /> -->
+                          <div  class="fallback-avatar">
+                            ABC
+                          </div>
+                        </div>
+
+                    </div>
+
+            }
+            
+            @if (!isAudioCall) {
+                <div class="video-call-area flex justify-center my-4 w-3/4">
+                    <video id="localVideo" autoplay muted class="w-1/2 border rounded mr-2"></video>
+                    <video id="remoteVideo" autoplay class="w-1/2 border rounded ml-2"></video>
+                </div>
+            }
+            <div class="call-controls flex justify-center mt-4">
+                <button class="bg-red-500 text-white px-4 py-2 rounded-md" (click)="stopCall()">
+                    <i class="fa-solid fa-phone-slash"></i> Hang Up
+                </button>
+            </div>
+        </div>
+    </div>
+</ng-container>

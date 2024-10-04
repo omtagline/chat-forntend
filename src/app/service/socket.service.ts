@@ -92,18 +92,41 @@ export class SocketService {
   }
 
 
-  sendOffer(offer: any, roomId: string) {
-    this.socket.emit('offer', { offer, roomId });
+  sendOffer(offer: RTCSessionDescription | null, roomId: string, to: string) {
+    this.socket.emit('offer', { offer, roomId, to });
   }
   
-  sendAnswer(answer: any, roomId: string) {
-    this.socket.emit('answer', { answer, roomId });
+  sendAnswer(answer: RTCSessionDescription | null, roomId: string, to: string) {
+    this.socket.emit('answer', { answer, roomId, to });
   }
   
-  sendIceCandidate(candidate: RTCIceCandidate, roomId: string) {
-    this.socket.emit('ice-candidate', { candidate, roomId });
+  sendIceCandidate(candidate: RTCIceCandidate, roomId: string, to: string) {
+    this.socket.emit('ice-candidate', { candidate, roomId, to });
   }
   
+
+
+  callJoin(data:any){
+    this.socket.emit('call-joined', {roomId:data.roomId,email:data.email});
+  }
+
+  callEnd(data:any){
+    this.socket.emit('call-ended', {roomId:data.roomId,email:data.email});
+  }
+
+  callStart(data:any){
+    this.socket.emit('call-started', {roomId:data.roomId,email:data.email});
+  }
+
+  callListen(){
+    return new Observable((observer) => {
+      this.socket.on('call-listen', (data: any) => {
+        observer.next(data);
+        })
+        })
+  }
+
+
   listenForOffer(): Observable<any> {
     return new Observable((observer) => {
       this.socket.on('offer', (data: any) => {

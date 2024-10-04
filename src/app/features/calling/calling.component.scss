@@ -1,0 +1,114 @@
+.video-call-container {
+
+    position: absolute;
+    background-color: white;
+width: 100vw;
+height: 100vh;
+
+    .video-call-area {
+      video {
+        object-fit: cover;
+        transition: all 0.3s ease;
+  
+        &:hover {
+          transform: scale(1.05);
+        }
+      }
+    }
+  
+    .call-controls {
+      .hangup-btn {
+        background-color: #ff4136;
+        border: none;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+  
+        &:hover {
+          background-color: #ff1a1a;
+          transform: scale(1.1);
+        }
+  
+        &:active {
+          transform: scale(0.95);
+        }
+  
+        i {
+          font-size: 24px;
+        }
+      }
+    }
+  }
+
+
+  .ringing-animation p {
+    font-size: 24px;
+    color: #ff3e00;
+    font-weight: bold;
+    animation: ringing 1s infinite;
+  }
+  
+  @keyframes ringing {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.2);
+      opacity: 0.5;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  
+
+  .participants {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: center;
+  
+    .participant {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+  
+    .profile-container {
+      position: relative;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      overflow: hidden;
+      margin-bottom: 8px;
+  
+      .profile-pic {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+      }
+  
+      .fallback-avatar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        background-color: #ccc;
+        color: #fff;
+        font-size: 36px;
+        font-weight: bold;
+        border-radius: 50%;
+      }
+    }
+  }
+  
